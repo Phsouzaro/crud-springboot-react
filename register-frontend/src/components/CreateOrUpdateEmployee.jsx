@@ -1,65 +1,71 @@
-import React, { Component, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import EmployeeService from '../services/EmployeeService';
 
 export default () => {
 
     let navigate = useNavigate();
 
+    const { id } = useParams();
     const [firstName, setfirstName] = useState('');
     const [lastName, setlastName] = useState('');
     const [emailId, setEmailId] = useState('');
-    const [saveEmployee, setSaveEmployee] = useState([]);
+
+    useEffect(() => {
+        if (id !== "_add")
+            EmployeeService.getEmployeeById(id).then(response => {
+                let employee = response.data;
+                setfirstName(employee.firstName);
+                setlastName(employee.lastName);
+                setEmailId(employee.emailId);
+            });
+    }, []);
 
     const saveEmployeeHandler = (e) => {
         e.preventDefault();
-
         let employee = { firstName: firstName, lastName: lastName, emailId: emailId };
         console.log(`Employee = ${JSON.stringify(employee)}`)
-        setSaveEmployee(employee);
+
+        id === "_add" ? EmployeeService.createEmployees(employee).then(response => {
+            navigate('/employees');
+        }) :
+            EmployeeService.updateEmployee(employee, id).then(response => {
+                navigate('/employees');
+            });
 
     }
 
-    const changeFirstNameHandler = (event) => {
-        setfirstName(event.target.value);
-    }
-    const changeLastNameHandler = (event) => {
-        setlastName(event.target.value);
-    }
-    const changeEmailNameHandler = (event) => {
-        setEmailId(event.target.value);
+    const getTitle = () => {
+        return id === "_add" ? <h3 className="text-center">Add Employee</h3> :
+            <h3 className="text-center">Update Employee</h3>;
     }
 
-    const cancel = (e) => {
-        e.preventDefault();
-        console.log('Chamou cancel')
-        navigate('/');
-    }
     return (
         <div>
             <div className="container">
                 <div className="row">
                     <div className="card col-md-6 offset-md-3 offset-md-3 " style={{ marginTop: "10px" }}>
-                        <h3 className="text-center">Add Employee</h3>
-
+                        {getTitle()}
                         <div className="card-body" >
                             <form>
                                 <div className="form-group">
                                     <label htmlFor="">First Name:</label>
                                     <input placeholder='First Name' name='firstname' className="form-control"
-                                        value={firstName} onChange={changeFirstNameHandler} />
+                                        value={firstName} onChange={(event) => setfirstName(event.target.value)} />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">Last Name:</label>
                                     <input placeholder='Last Name' name='lastname' className="form-control"
-                                        value={lastName} onChange={changeLastNameHandler} />
+                                        value={lastName} onChange={(event) => setlastName(event.target.value)} />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">E-mail:</label>
                                     <input placeholder='Email' name='email' className="form-control"
-                                        value={emailId} onChange={changeEmailNameHandler} />
+                                        value={emailId} onChange={(event) => setEmailId(event.target.value)} />
                                 </div>
+
                                 <button className="btn btn-success" onClick={saveEmployeeHandler}>Save</button>
-                                <button className="btn btn-danger" onClick={cancel} style={{ marginLeft: '10px' }}>Cancel</button>
+                                <button className="btn btn-danger" onClick={() => navigate('/')} style={{ marginLeft: '10px' }}>Cancel</button>
                             </form>
                         </div>
                     </div>

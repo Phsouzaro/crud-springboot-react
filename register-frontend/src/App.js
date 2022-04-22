@@ -3,8 +3,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Routes, Route } from 'react-router';
 import ListEmployeeComponent from './components/ListEmployeeComponent';
 import HeaderComponent from './components/HeaderComponent';
-import FooterComponent from './components/FooterComponent';
-import CreateEmployeeComponent from './components/CreateEmployeeComponent';
+import CreateOrUpdateEmployee from './components/CreateOrUpdateEmployee';
+import ViewEmployeeComponent from './components/ViewEmployeeComponent';
 
 function App() {
   return (
@@ -14,10 +14,10 @@ function App() {
         <Routes>
           <Route exact path="/" element={<ListEmployeeComponent />}></Route>
           <Route path="/employees" element={<ListEmployeeComponent />}></Route>
-          <Route path="/add-employee" element={<CreateEmployeeComponent />}></Route>
+          <Route path="/add-employee/:id" element={<CreateOrUpdateEmployee />}></Route>
+          <Route path="/view-employee/:id" element={<ViewEmployeeComponent />}></Route>
         </Routes>
       </div>
-      <FooterComponent />
     </Router>
   );
 }
